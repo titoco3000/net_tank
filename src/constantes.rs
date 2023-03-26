@@ -1,0 +1,21 @@
+/*
+Todas as constantes do jogo
+*/
+
+pub const PROPORCAO_JOGADOR:f32 = 1.0/20.0;
+pub const VELOCIDADE_ROTACAO:f32 = 2.0;
+pub const VELOCIDADE:f32 = 3.0 * PROPORCAO_JOGADOR;
+pub const ACELERACAO:f32 = 0.15;
+pub const DESACELERACAO:f32 = 0.1;
+
+pub const TEMPO_MORTE:u64 = 1000;
+pub const TEMPO_INVULNERAVEL: u64 = 4000;
+pub const INTERVALO_PISCADA: u64 = 100;
+
+pub const ALTURA_MIN_HEADER:f32 = 30.0;
+
+pub const TIMEOUT_JOGADOR: u64 = 5000;
+pub const INTERVALO_TIROS:u64 = 1000;
+pub const VELOCIDADE_TIRO:f32 = 8.0*PROPORCAO_JOGADOR;
+pub const PROPORCAO_TIRO:f32 = PROPORCAO_JOGADOR*0.1;
+pub const DISTANCIA_INICIAL_TIRO:f32 = 0.7*PROPORCAO_JOGADOR;

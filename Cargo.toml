@@ -1,0 +1,13 @@
+[package]
+name = "net_tank"
+version = "0.1.0"
+authors = ["Tito Guidotti <https://github.com/titoco3000>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+macroquad = "0.3"
+rusty_time = "0.12"
+local-ip-address = "0.5.1"
+winapi = {version = "0.3", features = ["wincon", "winuser"]}
