@@ -3,13 +3,13 @@ Todas as constantes do jogo
 */
 
 pub const PROPORCAO_JOGADOR:f32 = 1.0/20.0;
-pub const VELOCIDADE_ROTACAO:f32 = 2.0;
-pub const VELOCIDADE:f32 = 3.0 * PROPORCAO_JOGADOR;
-pub const ACELERACAO:f32 = 0.15;
+pub const VELOCIDADE_ROTACAO:f32 = 2.2;
+pub const VELOCIDADE:f32 = 4.0 * PROPORCAO_JOGADOR;
+pub const ACELERACAO:f32 = 0.2;
 pub const DESACELERACAO:f32 = 0.1;
 
 pub const TEMPO_MORTE:u64 = 1000;
-pub const TEMPO_INVULNERAVEL: u64 = 4000;
+pub const TEMPO_INVULNERAVEL: u64 = 2000;
 pub const INTERVALO_PISCADA: u64 = 100;
 
 pub const ALTURA_MIN_HEADER:f32 = 30.0;

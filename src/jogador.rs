@@ -5,6 +5,7 @@ use crate::input_jogador::InputJogador;
 use crate::tiro::Tiro;
 use rusty_time::timer::Timer;
 use std::f32::consts::PI;
+use rand::{self, Rng};
 
 /*
 Armazena dados do jogador
@@ -130,15 +131,17 @@ impl DadosJogador {
 
     }
 
-    pub fn matar(&mut self){
+    pub fn matar(&mut self, rng: &mut rand::rngs::ThreadRng){
         self.impulso = 0.0;
-        self.dir = 0.0;
+        self.dir = rand::rngs::ThreadRng::gen::<f32>(rng) * 2.0*PI;
         self.timer_morte.reset();
         self.timer_inalvejavel.reset();
         self.timer_invisivel.reset();
-        self.pontos /= 2;
-        self.x = 0.5;
-        self.y = 0.5;
+        if self.pontos>0{
+            self.pontos -= 1;
+        }
+        self.x = rng.gen();
+        self.y = rng.gen();
     }
 
     //booleanos de consulta

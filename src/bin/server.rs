@@ -2,8 +2,8 @@
 #![windows_subsystem = "windows"]
 
 use std::{f32::consts::PI, thread, sync::{Arc, Mutex}, path::Path};
-use macroquad::prelude::*;
 use net_tank::{constantes::*, jogadores::{Jogadores}, tiro::Tiro, jogador::DadosJogador, input_jogador::InputJogador};
+use macroquad::prelude::*;
 
 //retorna qual o tamanho do quadrado na qual cabe um quadrado rotacionado
 //usado para calculos de colisão
@@ -13,7 +13,7 @@ fn proporcao_quadrado_externo(angulo:f32)->f32{
 
 #[macroquad::main("Servidor NetTank")]
 async fn main() {
-    println!("main carregou");
+    let mut rng = ::rand::thread_rng();
     //esses if é só para se desviar de problemas com o borrow checker do rust
     if let Some(path_to_assets) = &std::env::args().next() {
         let path_to_assets = Path::new(path_to_assets).parent().unwrap();
@@ -178,7 +178,7 @@ async fn main() {
                                             j.pontos+=1;
                                         }
                                         tiros.swap_remove(j);
-                                        jogadores[i].matar();
+                                        jogadores[i].matar(&mut rng);
                                     }
                                     //descomente esse bloco para linhas de depuração
                                     /*
