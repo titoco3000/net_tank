@@ -1,9 +1,11 @@
 //impede que o executavel abra em um terminal
-#![windows_subsystem = "windows"]
+//#![windows_subsystem = "windows"]
 
 use std::{f32::consts::PI, thread, sync::{Arc, Mutex}, path::Path};
 use net_tank::{constantes::*, jogadores::{Jogadores}, tiro::Tiro, jogador::DadosJogador, input_jogador::InputJogador};
 use macroquad::prelude::*;
+use std::io::Write; // flush
+
 
 //retorna qual o tamanho do quadrado na qual cabe um quadrado rotacionado
 //usado para calculos de colisão
@@ -11,14 +13,28 @@ fn proporcao_quadrado_externo(angulo:f32)->f32{
      angulo.sin().abs()+angulo.cos().abs()
 }
 
+fn blend_color(blend:f32,a:Color, b:Color)->Color{
+    Color { 
+        r: a.r*(1.0-blend) + b.r*blend, 
+        g: a.g*(1.0-blend) + b.g*blend, 
+        b: a.b*(1.0-blend) + b.b*blend,
+        a: a.a*(1.0-blend) + b.a*blend
+     }
+}
+
 #[macroquad::main("Servidor NetTank")]
 async fn main() {
-    let mut rng = ::rand::thread_rng();
     //esses if é só para se desviar de problemas com o borrow checker do rust
     if let Some(path_to_assets) = &std::env::args().next() {
         let path_to_assets = Path::new(path_to_assets).parent().unwrap();
         
         let game_font = load_ttf_font(path_to_assets.join("assets\\fonts\\Fira_Sans\\FiraSans-Bold.ttf").to_str().unwrap()).await.unwrap();
+        let mut rng = ::rand::thread_rng(); 
+
+        let mut progresso_cor = 0.0;
+        let mut cor_matadora = 0;
+        let mut blend_matador;
+        let cores = vec![BLUE, GOLD, PINK, GREEN, YELLOW, ORANGE,PURPLE,BLUE];
         
         //abre socket
         let socket = net_tank::open_some_port().expect("Falha ao abrir porta");
@@ -27,14 +43,28 @@ async fn main() {
         let mut tiros = Vec::<Tiro>::with_capacity(100);
         let mut jogadores = Jogadores::with_capacity(20);
         let mut placar:Vec<(String,u32)> = Vec::with_capacity(20);
+        
+        let mut apelido = String::new();
+        loop{
+            print!("Apelido: ");
+            std::io::stdout().flush().unwrap(); //force flush
+            std::io::stdin().read_line(&mut apelido).unwrap();
+            apelido.truncate(apelido.trim_end().len());
+            //limita tamanho do nome
+            if apelido.chars().count() > 20{
+                println!("Grande demais, escolha um nome com menos de 20 caracteres");
+                continue;
+            }
+            break;
+        }
 
-        //adiciona o jogador local, "admin"
-        jogadores.push(DadosJogador::new("admin".to_string(),socket.local_addr().unwrap(),false));
+        //adiciona o jogador local
+        jogadores.push(DadosJogador::new(apelido,socket.local_addr().unwrap(),false));
         
         //MutexGuard para usar o obj jogadores em duas threads
         let jogadores =  Arc::new(Mutex::new(jogadores));
         let jogadores_na_thread = Arc::clone(&jogadores);
-    
+        
         thread::spawn(move || {
             //aloca buffer
             let mut buf = [0; 100];
@@ -59,7 +89,16 @@ async fn main() {
             }
         });
         
+        
+
         loop {
+            progresso_cor += get_frame_time()*VELOCIDADE_PROGRESSO_COR;
+            if progresso_cor>1.0{
+                progresso_cor = 0.0;
+                cor_matadora = (cor_matadora+1)%(cores.len()-1);
+            }
+            blend_matador = blend_color(progresso_cor, cores[cor_matadora], cores[cor_matadora+1]);
+
             //esses valores de tamanho (em pixels) são calculados no loop por causa de redimensionamento da janela
 
             //calcula tamanho da arena
@@ -117,7 +156,8 @@ async fn main() {
                                     header_size + jogadores[i].y*pixels_arena-jogadores[i].dir.sin()*tamanho_jogador*0.5, 
                                     jogadores[i].x*pixels_arena+jogadores[i].dir.cos()*tamanho_jogador*0.5, 
                                     header_size + jogadores[i].y*pixels_arena+jogadores[i].dir.sin()*tamanho_jogador*0.5, 
-                                tamanho_jogador, BLUE);
+                                    tamanho_jogador,
+                                    if jogadores[i].nome.ends_with("gêniomatador"){blend_matador}else{BLUE});
                                 //canhão
                                 draw_line(
                                     jogadores[i].x*pixels_arena, 
